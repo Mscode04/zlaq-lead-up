@@ -42,7 +42,7 @@ export function Hero() {
               />
             </span>
             <br />
-            in 2 minutes
+            in 1 minutes
           </motion.h1>
 
           {/* Subheadline */}
@@ -69,7 +69,7 @@ export function Hero() {
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
               <Clock className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">2-3 minutes</span>
+              <span className="text-sm font-medium">1-2 minutes</span>
             </div>
           </motion.div>
 
@@ -82,7 +82,7 @@ export function Hero() {
           >
             <Link to="/test">
               <Button variant="hero" size="xl" className="group">
-                Take the Free 2-min Test
+                Take the Free 1-min Test
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>

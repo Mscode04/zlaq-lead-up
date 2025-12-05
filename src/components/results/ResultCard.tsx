@@ -243,7 +243,7 @@ export function ResultCard({ result, userData, onJoinCommunity }: ResultCardProp
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button variant="hero" size="lg" onClick={handleDownloadPDF} className="gap-2 w-full shadow-lg shadow-primary/20">
                     <Download className="w-4 h-4 md:w-5 md:h-5" />
-                    Download PDF Report
+                    Download Report
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -262,13 +262,13 @@ export function ResultCard({ result, userData, onJoinCommunity }: ResultCardProp
                 className="gap-2 w-full"
               >
                 <Users className="w-4 h-4 md:w-5 md:h-5" />
-                Join Early Access Community
+                Join Community
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.01 }} className="sm:col-span-2">
               <Button variant="ghost" size="lg" onClick={handleContactAdmin} className="gap-2 w-full">
                 <Headphones className="w-4 h-4 md:w-5 md:h-5" />
-                Contact Admin for Support
+                Contact for Support
               </Button>
             </motion.div>
           </motion.div>
