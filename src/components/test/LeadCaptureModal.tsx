@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { User, Phone, Mail, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Phone, Sparkles, Loader2, AlertCircle, MessageCircle, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,41 +17,54 @@ interface LeadCaptureModalProps {
   answers: Answer[];
 }
 
+type FormStep = 'phone' | 'name';
+
 export function LeadCaptureModal({ open, onOpenChange, onSubmit, result, answers }: LeadCaptureModalProps) {
+  const [step, setStep] = useState<FormStep>('phone');
   const [formData, setFormData] = useState<LeadFormData>({
     name: '',
     whatsapp: '',
-    email: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<LeadFormData>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const validateForm = (): boolean => {
+  const validatePhone = (): boolean => {
     const newErrors: Partial<LeadFormData> = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
     if (!formData.whatsapp.trim()) {
-      newErrors.whatsapp = 'WhatsApp number is required';
+      newErrors.whatsapp = 'Phone number is required';
     } else if (!/^[+]?[\d\s-]{8,15}$/.test(formData.whatsapp.replace(/\s/g, ''))) {
       newErrors.whatsapp = 'Enter a valid phone number';
-    }
-    
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Enter a valid email';
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateName = (): boolean => {
+    const newErrors: Partial<LeadFormData> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (step === 'phone') {
+      if (validatePhone()) {
+        setStep('name');
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm() || !result) return;
+    if (!validateName() || !result) return;
     
     setIsSubmitting(true);
     setSubmitError(null);
@@ -63,7 +76,7 @@ export function LeadCaptureModal({ open, onOpenChange, onSubmit, result, answers
       const userId = await saveUserData({
         name: formData.name,
         whatsapp: formData.whatsapp,
-        email: formData.email || undefined,
+        email: undefined,
         result,
         answers: answers as unknown as Record<string, unknown>[],
       });
@@ -104,9 +117,6 @@ export function LeadCaptureModal({ open, onOpenChange, onSubmit, result, answers
             <Sparkles className="w-8 h-8 text-primary" />
           </motion.div>
           <DialogTitle className="text-2xl">Almost there! 🎉</DialogTitle>
-          <DialogDescription className="text-base">
-            Enter your details to unlock your personalized speech profile and get your report on WhatsApp.
-          </DialogDescription>
         </DialogHeader>
 
         {submitError && (
@@ -120,79 +130,118 @@ export function LeadCaptureModal({ open, onOpenChange, onSubmit, result, answers
           </div>
         )}
         
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              Your Name *
-            </Label>
-            <Input
-              id="name"
-              placeholder="Enter your name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className={errors.name ? 'border-destructive' : ''}
-            />
-            {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp" className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              WhatsApp Number *
-            </Label>
-            <Input
-              id="whatsapp"
-              type="tel"
-              placeholder="+91 98765 43210"
-              value={formData.whatsapp}
-              onChange={(e) => setFormData(prev => ({ ...prev, whatsapp: e.target.value }))}
-              className={errors.whatsapp ? 'border-destructive' : ''}
-            />
-            {errors.whatsapp && <p className="text-xs text-destructive">{errors.whatsapp}</p>}
-            <p className="text-xs text-muted-foreground">We'll send your report to this number</p>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              Email (Optional)
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className={errors.email ? 'border-destructive' : ''}
-            />
-            {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-          </div>
-          
-          <Button 
-            type="submit" 
-            variant="hero" 
-            size="lg" 
-            className="w-full mt-6"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Get My Speech Profile
-              </>
-            )}
-          </Button>
-          
-          <p className="text-xs text-center text-muted-foreground">
-            Your data is secure and will not be shared with third parties.
-          </p>
-        </form>
+        <AnimatePresence mode="wait">
+          {step === 'phone' && (
+            <motion.div
+              key="phone"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <DialogDescription className="text-base mb-4 text-center">
+                Share your report on WhatsApp
+              </DialogDescription>
+              
+              <form onSubmit={(e) => { e.preventDefault(); handleNextStep(); }} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="whatsapp" className="flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    Your Phone Number *
+                  </Label>
+                  <Input
+                    id="whatsapp"
+                    type="tel"
+                    placeholder="+91 98765 43210"
+                    value={formData.whatsapp}
+                    onChange={(e) => setFormData(prev => ({ ...prev, whatsapp: e.target.value }))}
+                    className={errors.whatsapp ? 'border-destructive' : ''}
+                    autoFocus
+                  />
+                  {errors.whatsapp && <p className="text-xs text-destructive">{errors.whatsapp}</p>}
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MessageCircle className="w-3 h-3" />
+                    We'll send your report to this WhatsApp number
+                  </p>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  variant="hero" 
+                  size="lg" 
+                  className="w-full mt-6 gap-2"
+                >
+                  Continue
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </form>
+            </motion.div>
+          )}
+
+          {step === 'name' && (
+            <motion.div
+              key="name"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+            >
+              <DialogDescription className="text-base mb-4 text-center">
+                How can I call you?
+              </DialogDescription>
+              
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Your Name *
+                  </Label>
+                  <Input
+                    id="name"
+                    placeholder="Enter your name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className={errors.name ? 'border-destructive' : ''}
+                    autoFocus
+                  />
+                  {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  variant="hero" 
+                  size="lg" 
+                  className="w-full mt-6"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Get My Speech Profile
+                    </>
+                  )}
+                </Button>
+              </form>
+              
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full mt-2"
+                onClick={() => setStep('phone')}
+                disabled={isSubmitting}
+              >
+                Back
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <p className="text-xs text-center text-muted-foreground mt-4">
+          Your data is secure and will not be shared with third parties.
+        </p>
       </DialogContent>
     </Dialog>
   );
