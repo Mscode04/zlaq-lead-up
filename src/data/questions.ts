@@ -1,6 +1,18 @@
 import { Question } from '@/types/test';
 
 export const testQuestions: Question[] = [
+  // Initial Screening
+  {
+    id: 'q0',
+    type: 'yes-no',
+    category: 'screening',
+    emoji: '🗣️',
+    text: 'Do you have stuttering?',
+  },
+];
+
+// Questions for users who have stuttering
+export const stutteringQuestions: Question[] = [
   // History / Risk
   {
     id: 'q1',
@@ -114,11 +126,102 @@ export const testQuestions: Question[] = [
   },
 ];
 
+// Questions for users who don't have stuttering
+export const communicationQuestions: Question[] = [
+  {
+    id: 'c1',
+    type: 'multiple-choice',
+    category: 'communication',
+    emoji: '🗣️',
+    text: 'What\'s your main communication challenge?',
+    options: [
+      'Speaking too fast',
+      'Difficulty finding words',
+      'Soft voice volume',
+      'Poor eye contact',
+      'Nervousness in groups',
+      'Other'
+    ],
+  },
+  {
+    id: 'c2',
+    type: 'slider',
+    category: 'communication',
+    emoji: '⏱️',
+    text: 'How often do you feel rushed when speaking?',
+    sliderMin: 0,
+    sliderMax: 10,
+    sliderLabels: { min: 'Never', max: 'Always' },
+  },
+  {
+    id: 'c3',
+    type: 'rank',
+    category: 'communication',
+    emoji: '📊',
+    text: 'Rank your most challenging situations:',
+    options: [
+      '📞 Phone conversations',
+      '🎤 Presentations',
+      '👥 Group discussions',
+      '💼 Job interviews',
+      '👋 Meeting new people',
+    ],
+  },
+  {
+    id: 'c4',
+    type: 'slider',
+    category: 'communication',
+    emoji: '😰',
+    text: 'How anxious do you feel before speaking?',
+    sliderMin: 0,
+    sliderMax: 10,
+    sliderLabels: { min: 'Calm', max: 'Very anxious' },
+  },
+  {
+    id: 'c5',
+    type: 'yes-no',
+    category: 'communication',
+    emoji: '🚫',
+    text: 'Do you avoid certain words or topics?',
+  },
+  {
+    id: 'c6',
+    type: 'slider',
+    category: 'communication',
+    emoji: '💪',
+    text: 'How confident are you in your communication?',
+    sliderMin: 0,
+    sliderMax: 10,
+    sliderLabels: { min: 'Not confident', max: 'Very confident' },
+  },
+  {
+    id: 'c7',
+    type: 'multiple-choice',
+    category: 'communication',
+    emoji: '🎯',
+    text: 'What would help you most?',
+    options: [
+      'Speaking slower',
+      'Better preparation',
+      'Confidence building',
+      'Voice training',
+      'Practice techniques'
+    ],
+  },
+  {
+    id: 'c8',
+    type: 'yes-no',
+    category: 'communication',
+    emoji: '📚',
+    text: 'Would you like communication improvement tips?',
+  },
+];
+
 export const testInfo = {
-  title: 'Stuttering Risk & Pattern Predictor (SRPP™)',
-  subtitle: 'Speech Anxiety & Situational Trigger Scale (SASTS)',
-  description: 'A science-backed assessment that maps your triggers, risk level, and daily exercises.',
-  trustLine: 'Developed from clinical practice & validated screening items used in speech-language pathology.',
+  title: 'Communication Assessment Tool',
+  subtitle: 'Personalized Communication & Stuttering Analysis',
+  description: 'A comprehensive assessment that identifies your communication patterns and provides tailored recommendations.',
+  trustLine: 'Developed from clinical practice & validated screening methods used in speech-language pathology.',
   duration: '2-3 minutes',
   questions: 12,
 };
